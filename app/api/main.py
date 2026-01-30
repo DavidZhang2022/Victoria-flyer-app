@@ -24,7 +24,8 @@ def latest(days: int = 14, limit: int = 200, db: Session = Depends(get_db)):
     return crud.latest_offers(db, days=days, limit=limit)
 
 @app.get("/offers/search", response_model=List[OfferOut])
-def search(q: str = Query(..., min_length=1), days: int = 14, limit: int = 200, db: Session = Depends(get_db)):
+def search(q: str = Query(..., min_length=1, description="Search keyword"), 
+           days: int = 14, limit: int = 200, db: Session = Depends(get_db)):
     return crud.search_offers(db, q=q, days=days, limit=limit)
 
 @app.get("/offers/by_product_key", response_model=List[OfferOut])
