@@ -33,7 +33,7 @@ class Offer(Base):
     promo_qty: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     promo_total_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
-    standardized_qty: Mapped[float | None] = mapped_column(Float, nullable=True)
+    standardized_qty: Mapped[Optional[float]]  = mapped_column(Float, nullable=True)
     standardized_unit: Mapped[str] = mapped_column(String(16), default="")
     unit_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     unit_price_label: Mapped[str] = mapped_column(String(16), default="")
