@@ -68,7 +68,8 @@ def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: st
     if not f["raw_name"]:
         return None
     price, promo_qty, promo_total = parse_price_text(f["raw_price_text"])
-    parsed_qty = parse_quantity_text(f["raw_quantity"])
+    qty_text = f["raw_quantity"] or f["raw_name"]  # ✅ 兜底：从标题里提取规格
+    parsed_qty = parse_quantity_text(qty_text)
     unit_price, unit_label = compute_unit_price(price, parsed_qty)
 
     return Offer(
@@ -79,7 +80,7 @@ def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: st
         flyer_item_id=flyer_item_id,
         raw_name=f["raw_name"],
         raw_price_text=f["raw_price_text"],
-        raw_quantity=f["raw_quantity"],
+        raw_quantity=f["raw_quantity"] or "",
         raw_valid_from=f["raw_valid_from"],
         raw_valid_to=f["raw_valid_to"],
         raw_disclaimer=f["raw_disclaimer"],
