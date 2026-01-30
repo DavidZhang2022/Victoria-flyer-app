@@ -5,6 +5,7 @@ from app.scraper.flipp_client import make_session, search_item_ids, fetch_item
 from app.scraper.unit_parser import parse_price_text, parse_quantity_text, compute_unit_price
 from app.scraper.normalize import normalize_name
 from app.db.models import Offer
+from typing import Optional
 
 def _safe_get(d: Any, path: str, default=None):
     cur = d
@@ -39,7 +40,7 @@ def extract_fields(item: Dict[str, Any]) -> dict:
         "image_url": str(image_url).strip(),
     }
 
-def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: str, item_json: Dict[str, Any]) -> Offer | None:
+def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: str, item_json: Dict[str, Any]) -> Optional[Offer]:
     f = extract_fields(item_json)
     if not f["raw_name"]:
         return None
@@ -72,7 +73,7 @@ def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: st
         fetched_at_utc=datetime.utcnow(),
     )
 
-def scrape_offers(city: str, postal_code: str, locale: str, store_queries: list[str],
+def scrape_offers(city: str, postal_code: str, locale: str, list[str],
                   max_items_per_store: int = 250, sleep_s: float = 0.2) -> List[Offer]:
     session = make_session()
     out: List[Offer] = []
