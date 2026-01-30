@@ -6,6 +6,7 @@ from app.scraper.unit_parser import parse_price_text, parse_quantity_text, compu
 from app.scraper.normalize import normalize_name
 from app.db.models import Offer
 from typing import Optional
+from typing import List, Optional
 
 def _safe_get(d: Any, path: str, default=None):
     cur = d
@@ -95,11 +96,12 @@ def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: st
         fetched_at_utc=datetime.utcnow(),
     )
 
-def scrape_offers(city: str, postal_code: str, locale: str, store_queries: list[str],
+def scrape_offers(city: str, postal_code: str, locale: str, store_queries: List[str],
                   max_items_per_store: int = 250, sleep_s: float = 0.2) -> List[Offer]:
     session = make_session()
     out: List[Offer] = []
     import time
+
     for sq in store_queries:
         ids = search_item_ids(session, sq, postal_code, locale, limit=max_items_per_store)
         for fid in ids:
@@ -108,8 +110,9 @@ def scrape_offers(city: str, postal_code: str, locale: str, store_queries: list[
                 offer = build_offer(city, postal_code, sq, fid, item)
                 if offer:
                     out.append(offer)
-            except Exception:
-                pass
+            except Exception as e:
+                print("ERR", sq, fid, repr(e))
             if sleep_s > 0:
                 time.sleep(sleep_s)
+
     return out
