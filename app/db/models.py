@@ -2,6 +2,7 @@ from __future__ import annotations
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import String, Float, DateTime, Integer, Index
 from datetime import datetime
+from typing import Optional
 
 class Base(DeclarativeBase):
     pass
@@ -28,13 +29,13 @@ class Offer(Base):
     image_url: Mapped[str] = mapped_column(String(1024), default="")
     source_item_url: Mapped[str] = mapped_column(String(1024), default="")
 
-    price: Mapped[float | None] = mapped_column(Float, nullable=True)
-    promo_qty: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    promo_total_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    promo_qty: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    promo_total_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     standardized_qty: Mapped[float | None] = mapped_column(Float, nullable=True)
     standardized_unit: Mapped[str] = mapped_column(String(16), default="")
-    unit_price: Mapped[float | None] = mapped_column(Float, nullable=True)
+    unit_price: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     unit_price_label: Mapped[str] = mapped_column(String(16), default="")
 
     product_key: Mapped[str] = mapped_column(String(512), index=True)
