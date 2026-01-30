@@ -16,32 +16,54 @@ def _safe_get(d: Any, path: str, default=None):
             return default
     return cur
 
-def extract_fields(item: Dict[str, Any]) -> dict:
-    raw_name = item.get("name") or item.get("title") or _safe_get(item, "item.name") or _safe_get(item, "item.title") or ""
-    merchant_name = _safe_get(item, "merchant.name") or _safe_get(item, "retailer.name") or item.get("merchant_name") or ""
-    raw_price_text = item.get("price") or item.get("current_price") or _safe_get(item, "pricing.price") or ""
-    if isinstance(raw_price_text, dict):
-        raw_price_text = raw_price_text.get("text") or raw_price_text.get("value") or ""
-    raw_qty = item.get("quantity") or item.get("size") or _safe_get(item, "display_quantity") or ""
-    if isinstance(raw_qty, dict):
-        raw_qty = raw_qty.get("text") or raw_qty.get("value") or ""
-    raw_valid_from = item.get("valid_from") or item.get("start_date") or _safe_get(item, "flyer.valid_from") or ""
-    raw_valid_to = item.get("valid_to") or item.get("end_date") or _safe_get(item, "flyer.valid_to") or ""
-    raw_disclaimer = item.get("disclaimer") or item.get("description") or item.get("deal_text") or ""
-    image_url = item.get("image_url") or item.get("cutout_image_url") or _safe_get(item, "image.url") or ""
+from typing import Any, Dict
+
+def extract_fields(item_json: Dict[str, Any]) -> dict:
+    # fetch_item 返回 {"item": {...}}
+    it = item_json.get("item") or item_json
+
+    raw_name = (it.get("name") or it.get("title") or "").strip()
+
+    # 你的 debug JSON 里 merchant 是字符串："Fairway Markets"
+    merchant_name = (it.get("merchant") or "").strip()
+
+    # 价格字段：price_text / pre_price_text / current_price（按优先级取）
+    raw_price_text = (it.get("price_text") or it.get("pre_price_text") or it.get("current_price") or "").strip()
+
+    # 数量字段：你的样例里没看到 quantity，但先这样写；后面可根据 JSON 再补
+    raw_qty = (it.get("quantity") or it.get("size") or "").strip()
+
+    raw_valid_from = (it.get("valid_from") or it.get("flyer_valid_from") or "").strip()
+    raw_valid_to = (it.get("valid_to") or it.get("flyer_valid_to") or "").strip()
+
+    raw_disclaimer = (it.get("disclaimer_text") or it.get("description") or it.get("flyer_disclaimer_text") or "").strip()
+
+    image_url = (it.get("cutout_image_url") or it.get("image_url") or it.get("image") or "").strip()
+
     return {
-        "raw_name": str(raw_name).strip(),
-        "merchant_name": str(merchant_name).strip(),
-        "raw_price_text": str(raw_price_text).strip(),
-        "raw_quantity": str(raw_qty).strip(),
-        "raw_valid_from": str(raw_valid_from).strip(),
-        "raw_valid_to": str(raw_valid_to).strip(),
-        "raw_disclaimer": str(raw_disclaimer).strip(),
-        "image_url": str(image_url).strip(),
+        "raw_name": raw_name,
+        "merchant_name": merchant_name,
+        "raw_price_text": raw_price_text,
+        "raw_quantity": raw_qty,
+        "raw_valid_from": raw_valid_from,
+        "raw_valid_to": raw_valid_to,
+        "raw_disclaimer": raw_disclaimer,
+        "image_url": image_url,
+        # 可选：用于过滤广告块
+        "ttm_label": (it.get("ttm_label") or "").strip(),
     }
+
 
 def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: str, item_json: Dict[str, Any]) -> Optional[Offer]:
     f = extract_fields(item_json)
+        # 过滤：没有价格的直接跳过
+    if not f["raw_price_text"]:
+        return None
+
+    # 过滤：See It 类（通常无价的入口块）
+    if f.get("ttm_label", "").lower() == "see it":
+        return None
+
     if not f["raw_name"]:
         return None
     price, promo_qty, promo_total = parse_price_text(f["raw_price_text"])
