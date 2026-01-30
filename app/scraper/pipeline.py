@@ -95,7 +95,7 @@ def build_offer(city: str, postal_code: str, store_query: str, flyer_item_id: st
         fetched_at_utc=datetime.utcnow(),
     )
 
-def scrape_offers(city: str, postal_code: str, locale: str, list[str],
+def scrape_offers(city: str, postal_code: str, locale: str, store_queries: list[str],
                   max_items_per_store: int = 250, sleep_s: float = 0.2) -> List[Offer]:
     session = make_session()
     out: List[Offer] = []
