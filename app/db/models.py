@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import String, Float, DateTime, Integer, Index
 from datetime import datetime
@@ -12,7 +13,13 @@ class Offer(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
-    category: Mapped[str] = mapped_column(String, index=True)
+    category: Mapped[str] = mapped_column(
+    String,
+    nullable=False,
+    default="Other",          # Python side default
+    server_default="Other",   # DB side default
+    index=True
+    )
 
 
     city: Mapped[str] = mapped_column(String(64), index=True)
