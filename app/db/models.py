@@ -12,6 +12,9 @@ class Offer(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
+    category = Column(String, index=True)
+
+
     city: Mapped[str] = mapped_column(String(64), index=True)
     postal_code: Mapped[str] = mapped_column(String(16), index=True)
 

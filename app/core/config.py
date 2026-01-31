@@ -11,5 +11,5 @@ LOCALE = os.getenv("LOCALE", "en-ca").strip()
 
 STORE_QUERIES = [s.strip() for s in os.getenv(
     "STORE_QUERIES",
-    "Walmart,Save-On-Foods,Thrifty Foods,Fairway Market"
+    "Walmart,Save-On-Foods,Thrifty Foods,Fairway Market,Superstore,Costco"
 ).split(",") if s.strip()]
