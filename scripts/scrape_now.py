@@ -17,13 +17,15 @@ if __name__ == "__main__":
     store_queries = [
     "Walmart",
     "Save-On-Foods",
+    "Superstore",
+    "Whold Foods",
     "Thrifty Foods",
     "Fairway Market",
     "Country Grocer",
     "Wholesale Club",
     "Quality Foods",
     "Root Cellar",
-    "Costco",
+    "Costco"
     ]
     
     db = SessionLocal()
